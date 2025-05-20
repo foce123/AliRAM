@@ -1,6 +1,4 @@
-numpy>=1.24.0
-pillow>=10.0.0
-loguru>=0.7.0
-aiohttp>=3.8.0
-akshare>=1.16.43
-tomli>=2.0.0 
+xpinyin>=0.7.6
+alibabacloud-ims20190815>=3.3.0
+alibabacloud_tea_openapi>=0.3.13
+alibabacloud_tea_util>=0.3.0
