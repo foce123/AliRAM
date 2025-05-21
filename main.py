@@ -41,6 +41,7 @@ class AliRAM(PluginBase):
         
         with open("plugins/AliRAM/config.toml", "rb") as f:
             plugin_config = tomllib.load(f)
+            logger.info("插件配置文件加载成功")
         config = plugin_config["AliAccount"]
         self.enable = config["enable"]
         self.ak = config["ak"]
@@ -74,6 +75,25 @@ class AliRAM(PluginBase):
             return True
         except:
             return False
+    
+    def create(self, name, dname) -> bool:
+        client = self.create_client()
+        create_user_request = ims_20190815_models.CreateUserRequest(
+            user_principal_name=name,
+            display_name=dname
+        )
+        runtime = util_models.RuntimeOptions()
+        try:
+            client.create_user_with_options(create_user_request, runtime)
+            return True
+        except:
+            return False
+    
+    @on_text_message
+    async def handle_text_message(self) -> bool:
+        """处理文本消息，检查是否包含指令，并解析命令。"""
+        return True  # 不是该插件的指令，允许其他插件处理
+    
     @on_at_message
     async def handle_at_message(self, bot: WechatAPIClient, message: Dict) -> bool:
         """处理@消息，检查是否包含指令，并解析命令。"""
@@ -86,8 +106,9 @@ class AliRAM(PluginBase):
         # 移除@标记和特殊字符，仅保留实际文本内容
         # 注意：这里可能需要根据实际的@消息格式进行调整
         content = re.sub(r'@\S+\s+', '', content).strip()
+        logger.info(content)
         
-        # 检查是否为股票分析命令
+        # 检查是否为正确指令
         match = re.match(self.COMMAND_PATTERN, content)
         if match:
             cname, optname, oname = match.groups()
@@ -95,13 +116,24 @@ class AliRAM(PluginBase):
                 oname = oname.split(' ')[0]
             if cname == "aliaccount":
                 if optname == "query":
-                    aname = self.topinyin(oname)
+                    logger.info("查询用户")
+                    aname = self.topinyin(oname) + '@1459359830040602.onaliyun.com'
                     if self.query(aname):
                         await bot.send_text_message(chat_id, str(aname) + "该用户已存在")
                         logger.info(str(aname) + "该用户已存在")
                     else:
                         await bot.send_text_message(chat_id, str(aname) +"该用户不存在")
                         logger.info(str(aname) +"该用户不存在")
+                elif optname == "create":
+                    logger.info("创建用户")
+                    aname = self.topinyin(oname) + '@1459359830040602.onaliyun.com'
+                    if self.query(aname):
+                        logger.info("该用户已存在")
+                        await bot.send_text_message(chat_id, str(aname) + "该用户已存在,不创建")
+                    else:
+                        logger.info("该用户不存在，创建用户")
+                        self.create(aname, oname)
+                        await bot.send_text_message(chat_id, "创建用户成功:  " + str(oname) + "  " + str(aname))
             
         return True  # 不是该插件的指令，允许其他插件处理
 
