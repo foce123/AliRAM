@@ -46,6 +46,7 @@ class AliRAM(PluginBase):
             logger.info("插件配置文件加载成功")
         config = plugin_config["AliAccount"]
         self.enable = config["enable"]
+        self.id = config["id"]
         self.ak = config["ak"]
         self.sk = config["sk"]
     
@@ -154,7 +155,7 @@ class AliRAM(PluginBase):
             if cname == "aliaccount":
                 if optname == "query":
                     logger.info("查询用户")
-                    aname = self.topinyin(oname) + '@1459359830040602.onaliyun.com'
+                    aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
                     if self.query(aname):
                         await bot.send_text_message(chat_id, str(aname) + "该用户已存在")
                         logger.info(str(aname) + "该用户已存在")
@@ -163,7 +164,7 @@ class AliRAM(PluginBase):
                         logger.info(str(aname) +"该用户不存在")
                 elif optname == "create":
                     logger.info("创建用户")
-                    aname = self.topinyin(oname) + '@1459359830040602.onaliyun.com'
+                    aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
                     if self.query(aname):
                         logger.info("该用户已存在")
                         await bot.send_text_message(chat_id, str(aname) + "该用户已存在,不创建")
@@ -176,7 +177,7 @@ class AliRAM(PluginBase):
                                 await bot.send_text_message(chat_id, "登录名称:" + str(aname) + "\n" + "新密码:" + str(password))
                 elif optname == "delete":
                     logger.info("删除用户")
-                    aname = self.topinyin(oname) + '@1459359830040602.onaliyun.com'
+                    aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
                     if self.query(aname):
                         logger.info("该用户存在，开始删除用户")
                         self.delete(aname)
