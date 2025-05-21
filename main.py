@@ -4,6 +4,8 @@ from typing import Dict
 
 from loguru import logger
 import tomllib
+import random
+import string
 
 from WechatAPI import WechatAPIClient
 from utils.decorators import on_at_message on_text_message
@@ -89,6 +91,41 @@ class AliRAM(PluginBase):
         except:
             return False
     
+    def delete(self, name) -> bool:
+        client = self.create_client()
+        delete_user_request = ims_20190815_models.DeleteUserRequest(
+            user_principal_name=name
+        )
+        runtime = util_models.RuntimeOptions()
+        try:
+            client.delete_user_with_options(delete_user_request, runtime)
+            return True
+        except:
+            return False
+    
+    def modify(self, name, dname) -> bool:
+        pass
+    
+    def active(self, name,password) -> bool:
+        client = self.create_client()
+        create_login_profile_request = ims_20190815_models.CreateLoginProfileRequest(
+            user_principal_name=name,
+            password=password,
+            password_reset_required=True
+        )
+        runtime = util_models.RuntimeOptions()
+        try:
+            # 复制代码运行请自行打印 API 的返回值
+            client.create_login_profile_with_options(create_login_profile_request, runtime)
+            return True
+        except:
+            return False
+    
+    def generate_password() -> str:
+        """生成随机密码"""
+        random_password = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=32))
+        return random_password
+    
     @on_text_message
     async def handle_text_message(self) -> bool:
         """处理文本消息，检查是否包含指令，并解析命令。"""
@@ -132,8 +169,17 @@ class AliRAM(PluginBase):
                         await bot.send_text_message(chat_id, str(aname) + "该用户已存在,不创建")
                     else:
                         logger.info("该用户不存在，创建用户")
-                        self.create(aname, oname)
-                        await bot.send_text_message(chat_id, "创建用户成功:  " + str(oname) + "  " + str(aname))
+                        if self.create(aname, oname):
+                            await bot.send_text_message(chat_id, "创建用户成功:  " + str(oname) + "  " + str(aname))
+                            password = self.generate_password()
+                            if self.active(aname,password):
+                                await bot.send_text_message(chat_id, "登录名称:" + str(aname) + "\n" + "新密码:" + str(password))
+                elif optname == "delete":
+                    logger.info("删除用户")
+                    aname = self.topinyin(oname) + '@1459359830040602.onaliyun.com'
+                    if self.query(aname):
+                        logger.info("该用户存在，开始删除用户")
+                        self.delete(aname)
             
         return True  # 不是该插件的指令，允许其他插件处理
 
