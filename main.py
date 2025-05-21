@@ -107,7 +107,7 @@ class AliRAM(PluginBase):
     def modify(self, name, dname) -> bool:
         pass
     
-    def active(self, name,password) -> bool:
+    def activename(self, name, password) -> bool:
         client = self.create_client()
         create_login_profile_request = ims_20190815_models.CreateLoginProfileRequest(
             user_principal_name=name,
@@ -172,9 +172,14 @@ class AliRAM(PluginBase):
                         logger.info("该用户不存在，创建用户")
                         if self.create(aname, oname):
                             await bot.send_text_message(chat_id, "创建用户成功:  " + str(oname) + "  " + str(aname))
+                            logger.info("创建用户成功:  " + str(oname) + "  " + str(aname))
                             password = self.generate_password()
-                            if self.active(aname,password):
+                            if self.activename(aname, password):
                                 await bot.send_text_message(chat_id, "登录名称:" + str(aname) + "\n" + "新密码:" + str(password))
+                            else:
+                                logger.info("用户启用失败:  " + str(oname) + "  " + str(aname))
+                        else:
+                            logger.info("创建用户失败:  " + str(oname) + "  " + str(aname))
                 elif optname == "delete":
                     logger.info("删除用户")
                     aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
