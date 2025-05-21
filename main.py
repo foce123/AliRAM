@@ -8,7 +8,7 @@ import random
 import string
 
 from WechatAPI import WechatAPIClient
-from utils.decorators import on_at_message on_text_message
+from utils.decorators import on_at_message, on_text_message
 from utils.plugin_base import PluginBase
 
 from xpinyin import Pinyin
