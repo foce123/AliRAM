@@ -6,7 +6,7 @@ from loguru import logger
 import tomllib
 
 from WechatAPI import WechatAPIClient
-from utils.decorators import on_at_message
+from utils.decorators import on_at_message on_text_message
 from utils.plugin_base import PluginBase
 
 from xpinyin import Pinyin
