@@ -29,7 +29,7 @@ class AliRAM(PluginBase):
     version = "1.0.1"
 
     # 分析命令的正则表达式
-    COMMAND_PATTERN = r'^(aliaccount)\s*(query|create|delete|modify)\s*(.+)$'
+    COMMAND_PATTERN = r'^(aliaccount)\s*(query|create|delete|update)\s*(.+)$'
 
     def __init__(self):
         super().__init__()
@@ -49,6 +49,7 @@ class AliRAM(PluginBase):
         self.id = config["id"]
         self.ak = config["ak"]
         self.sk = config["sk"]
+        self.admins = config["admins"]
     
     def topinyin(self, name):
         """
@@ -122,10 +123,19 @@ class AliRAM(PluginBase):
         except:
             return False
     
-    def generate_password() -> str:
-        """生成随机密码"""
-        random_password = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=32))
-        return random_password
+    def updatepassword(self, name, password) -> bool:
+        client = self.create_client()
+        update_login_profile_request = ims_20190815_models.UpdateLoginProfileRequest(
+            user_principal_name=name,
+            password=password,
+            password_reset_required=True
+        )
+        runtime = util_models.RuntimeOptions()
+        try:
+            client.update_login_profile_with_options(update_login_profile_request, runtime)
+            return True
+        except:
+            return False
     
     @on_text_message
     async def handle_text_message(self) -> bool:
@@ -150,9 +160,12 @@ class AliRAM(PluginBase):
         match = re.match(self.COMMAND_PATTERN, content)
         if match:
             cname, optname, oname = match.groups()
-            if ' ' in oname and optname != "modify":
+            if ' ' in oname and optname != "update":
                 oname = oname.split(' ')[0]
-            if cname == "aliaccount":
+            elif ' ' in oname and optname == "update":
+                sname = oname.split(' ')[0]
+                oname = oname.split(' ')[1]
+            if cname == "aliaccount" and message["SenderWxid"] in self.admins:
                 if optname == "query":
                     logger.info("查询用户")
                     aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
@@ -173,7 +186,7 @@ class AliRAM(PluginBase):
                         if self.create(aname, oname):
                             await bot.send_text_message(chat_id, "创建用户成功:  " + str(oname) + "  " + str(aname))
                             logger.info("创建用户成功:  " + str(oname) + "  " + str(aname))
-                            password = self.generate_password()
+                            password = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=32))
                             if self.activename(aname, password):
                                 await bot.send_text_message(chat_id, "登录名称:" + str(aname) + "\n" + "新密码:" + str(password))
                             else:
@@ -185,7 +198,25 @@ class AliRAM(PluginBase):
                     aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
                     if self.query(aname):
                         logger.info("该用户存在，开始删除用户")
-                        self.delete(aname)
+                        if self.delete(aname):
+                            await bot.send_text_message(chat_id, "删除用户成功:  " + str(oname) + "  " + str(aname))
+                elif optname == "update":
+                    logger.info("更新操作")
+                    aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
+                    if sname == "password":
+                        logger.info("更新密码")
+                        password = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=32))
+                        if self.query(aname):
+                            logger.info("该用户存在，开始更新该用户密码")
+                            await bot.send_text_message(chat_id, "开始更新" + str(oname) + "用户密码")
+                            if self.updatepassword(aname, password):
+                                await bot.send_text_message(chat_id, "登录名称:" + str(aname) + "\n" + "新密码:" + str(password))
+                        else:
+                            logger.info("该用户不存在，无法更新该用户密码")
+                        
+            else:
+                logger.info("权限不足")
+                await bot.send_text_message(chat_id, "你没有权限使用此命令")
             
         return True  # 不是该插件的指令，允许其他插件处理
 
