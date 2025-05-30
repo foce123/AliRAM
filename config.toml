@@ -1,0 +1,7 @@
+[AliAccount]
+enable = true
+commands = ["aliaccount"]
+id  = ""  # 主账号id
+ak = ""
+sk = ""
+admins = [""]
