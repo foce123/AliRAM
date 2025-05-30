@@ -26,7 +26,7 @@ class AliRAM(PluginBase):
 
     description = "RAM用户管理"
     author = "柏煊"
-    version = "1.0.1"
+    version = "1.0.2"
 
     # 分析命令的正则表达式
     COMMAND_PATTERN = r'^(aliaccount)\s*(query|create|delete|update)\s*(.+)$'
