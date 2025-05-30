@@ -1,5 +1,6 @@
 xpinyin>=0.7.6
 loguru>=0.7.3
+toml>=0.10.2
 alibabacloud-ims20190815>=3.3.0
 alibabacloud_tea_openapi>=0.3.13
 alibabacloud_tea_util>=0.3.0
