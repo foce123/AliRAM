@@ -26,7 +26,7 @@ class AliRAM(PluginBase):
 
     description = "RAM用户管理"
     author = "柏煊"
-    version = "1.0.2"
+    version = "1.0.3"
 
     # 分析命令的正则表达式
     COMMAND_PATTERN = r'^(aliaccount)\s*(query|create|delete|update)\s*(.+)$'
@@ -75,10 +75,13 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            client.get_user_with_options(get_user_request, runtime)
-            return True
-        except:
-            return False
+            res = client.get_user_with_options(get_user_request, runtime).to_map()
+            if res["status_code"] == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(f"查询用户失败: {e}")
     
     def create(self, name, dname) -> bool:
         client = self.create_client()
@@ -88,10 +91,13 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            client.create_user_with_options(create_user_request, runtime)
-            return True
-        except:
-            return False
+            res = client.create_user_with_options(create_user_request, runtime).to_map()
+            if res["status_code"] == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(f"创建用户失败: {e}")
     
     def delete(self, name) -> bool:
         client = self.create_client()
@@ -100,10 +106,13 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            client.delete_user_with_options(delete_user_request, runtime)
-            return True
-        except:
-            return False
+            res = client.delete_user_with_options(delete_user_request, runtime).to_map()
+            if  res["status_code"] == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(f"删除用户失败: {e}")
     
     def modify(self, name, dname) -> bool:
         pass
@@ -118,10 +127,13 @@ class AliRAM(PluginBase):
         runtime = util_models.RuntimeOptions()
         try:
             # 复制代码运行请自行打印 API 的返回值
-            client.create_login_profile_with_options(create_login_profile_request, runtime)
-            return True
-        except:
-            return False
+            res = client.create_login_profile_with_options(create_login_profile_request, runtime).to_map()
+            if res["status_code"] == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(f"激活用户失败: {e}")
     
     def updatepassword(self, name, password) -> bool:
         client = self.create_client()
@@ -132,10 +144,13 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            client.update_login_profile_with_options(update_login_profile_request, runtime)
-            return True
-        except:
-            return False
+            res = client.update_login_profile_with_options(update_login_profile_request, runtime).to_map()
+            if res["status_code"] == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(f"更新用户密码失败: {e}")
     
     def updateuser(self, name, sname, dname) -> bool:
         client = self.create_client()
@@ -146,10 +161,13 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            client.update_user_with_options(update_user_request, runtime)
-            return True
-        except:
-            return False
+            res = client.update_user_with_options(update_user_request, runtime).to_map()
+            if res["status_code"] == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(f"更新用户信息失败: {e}")
     
     @on_text_message
     async def handle_text_message(self) -> bool:
@@ -209,6 +227,7 @@ class AliRAM(PluginBase):
                                 logger.info("用户启用失败:  " + str(oname) + "  " + str(aname))
                         else:
                             logger.info("创建用户失败:  " + str(oname) + "  " + str(aname))
+                            await bot.send_text_message(chat_id, "创建用户失败")
                 elif optname == "delete":
                     logger.info("删除用户")
                     aname = self.topinyin(oname) + '@' + self.id +'.onaliyun.com'
