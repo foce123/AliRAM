@@ -35,7 +35,7 @@ class AliRAM(PluginBase):
         super().__init__()
         self.name = "AliRAM"
         self.description = "阿里云RAM账号管理插件"
-        self.version = "1.0.0"
+        self.version = "1.0.3"
         self.author = "柏煊"
         
         # 添加logger
