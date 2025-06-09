@@ -75,13 +75,10 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            res = client.get_user_with_options(get_user_request, runtime).to_map()
-            if res["status_code"] == 200:
-                return True
-            else:
-                return False
-        except Exception as e:
-            logger.error(f"查询用户失败: {e}")
+            client.get_user_with_options(get_user_request, runtime)
+            return True
+        except:
+            return False
     
     def create(self, name, dname) -> bool:
         client = self.create_client()
@@ -91,13 +88,10 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            res = client.create_user_with_options(create_user_request, runtime).to_map()
-            if res["status_code"] == 200:
-                return True
-            else:
-                return False
-        except Exception as e:
-            logger.error(f"创建用户失败: {e}")
+            client.create_user_with_options(create_user_request, runtime)
+            return True
+        except:
+            return False
     
     def delete(self, name) -> bool:
         client = self.create_client()
@@ -106,16 +100,10 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            res = client.delete_user_with_options(delete_user_request, runtime).to_map()
-            if  res["status_code"] == 200:
-                return True
-            else:
-                return False
-        except Exception as e:
-            logger.error(f"删除用户失败: {e}")
-    
-    def modify(self, name, dname) -> bool:
-        pass
+            client.delete_user_with_options(delete_user_request, runtime)
+            return True
+        except:
+            return False
     
     def activename(self, name, password) -> bool:
         client = self.create_client()
@@ -127,13 +115,10 @@ class AliRAM(PluginBase):
         runtime = util_models.RuntimeOptions()
         try:
             # 复制代码运行请自行打印 API 的返回值
-            res = client.create_login_profile_with_options(create_login_profile_request, runtime).to_map()
-            if res["status_code"] == 200:
-                return True
-            else:
-                return False
-        except Exception as e:
-            logger.error(f"激活用户失败: {e}")
+            client.create_login_profile_with_options(create_login_profile_request, runtime)
+            return True
+        except:
+            return False
     
     def updatepassword(self, name, password) -> bool:
         client = self.create_client()
@@ -144,13 +129,10 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            res = client.update_login_profile_with_options(update_login_profile_request, runtime).to_map()
-            if res["status_code"] == 200:
-                return True
-            else:
-                return False
-        except Exception as e:
-            logger.error(f"更新用户密码失败: {e}")
+            client.update_login_profile_with_options(update_login_profile_request, runtime)
+            return True
+        except:
+            return False
     
     def updateuser(self, name, sname, dname) -> bool:
         client = self.create_client()
@@ -161,13 +143,10 @@ class AliRAM(PluginBase):
         )
         runtime = util_models.RuntimeOptions()
         try:
-            res = client.update_user_with_options(update_user_request, runtime).to_map()
-            if res["status_code"] == 200:
-                return True
-            else:
-                return False
-        except Exception as e:
-            logger.error(f"更新用户信息失败: {e}")
+            client.update_user_with_options(update_user_request, runtime)
+            return True
+        except:
+            return False
     
     @on_text_message
     async def handle_text_message(self) -> bool:
